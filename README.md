@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# AV Edge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**AV Edge** is a web platform designed for professional audio-visual (AV) end-users and rental companies to **search, compare, and connect** with equipment rental providers across the United States.
 
-Currently, two official plugins are available:
+The goal is to simplify the process of finding specific gear — especially when local inventory is limited — by creating a **centralized, searchable network** of verified rental houses and integrators.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Project Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Problem
+Finding AV rental gear today often means endless calls and emails to regional providers. There’s no single source of truth for what gear is available nearby, or how to quickly compare pricing and lead time.
 
-## Expanding the ESLint configuration
+### Solution
+AV Edge aggregates regional rental inventories into one searchable platform.  
+Users can:
+- Search by model, category, or state  
+- View equipment details and providers  
+- Request rental quotes directly from verified companies  
+- List their own company and upload inventory data  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧱 Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| Layer | Tech |
+|-------|------|
+| **Frontend** | [React](https://react.dev/) (TypeScript) + [Vite](https://vitejs.dev/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) |
+| **Routing** | [React Router DOM](https://reactrouter.com/) |
+| **Deployment** | [GitHub Pages](https://pages.github.com/) with GitHub Actions CI/CD |
+| **Forms** | [Formspree](https://formspree.io/) for provider intake (no backend required) |
+| **Data Storage (MVP)** | Local JSON files (`/src/data/`) for mocked listings and providers |
+| **Validation** | [Zod](https://zod.dev/) (light client-side schema validation) |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚙️ Local Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+)
+- [Git](https://git-scm.com/)
+- A text editor like [VS Code](https://code.visualstudio.com/)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 1. Clone and install
+```bash
+git clone https://github.com/YOUR_USERNAME/avedge.github.io.git
+cd avedge.github.io
+npm install
