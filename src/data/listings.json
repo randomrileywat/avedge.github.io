@@ -1,0 +1,50 @@
+[
+  {
+    "id": "la12x-001",
+    "make": "L-Acoustics",
+    "model": "LA12X",
+    "category": "Audio",
+    "dailyRateUSD": 250,
+    "locationCity": "Dallas",
+    "locationState": "TX",
+    "provider": { "name": "Red River AV", "website": "https://example.com" },
+    "tags": ["amp", "controller", "l-nac"],
+    "quantity": 12
+  },
+  {
+    "id": "e2-001",
+    "make": "Barco",
+    "model": "E2-Gen2",
+    "category": "Video",
+    "dailyRateUSD": 750,
+    "locationCity": "Kansas City",
+    "locationState": "MO",
+    "provider": { "name": "Midwest Staging", "website": "https://example.com" },
+    "tags": ["presentation", "router", "eventmaster"],
+    "quantity": 2
+  },
+  {
+    "id": "ks21-001",
+    "make": "L-Acoustics",
+    "model": "KS21",
+    "category": "Audio",
+    "dailyRateUSD": 90,
+    "locationCity": "Tulsa",
+    "locationState": "OK",
+    "provider": { "name": "Route 66 Productions" },
+    "tags": ["subwoofer"],
+    "quantity": 24
+  },
+  {
+    "id": "vx4s-001",
+    "make": "Novastar",
+    "model": "VX4S",
+    "category": "Video",
+    "dailyRateUSD": 120,
+    "locationCity": "Oklahoma City",
+    "locationState": "OK",
+    "provider": { "name": "Sooner Media" },
+    "tags": ["led", "processor"],
+    "quantity": 6
+  }
+]
