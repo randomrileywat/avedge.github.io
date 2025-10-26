@@ -1,0 +1,32 @@
+[
+  {
+    "id": "route66",
+    "name": "Route 66 Productions",
+    "website": "https://example.com",
+    "phone": "(918) 555-0114",
+    "city": "Tulsa",
+    "state": "OK",
+    "categories": ["Audio", "Video", "Lighting"],
+    "notes": "Regional staging & rentals. L-Acoustics inventory."
+  },
+  {
+    "id": "redriver",
+    "name": "Red River AV",
+    "website": "https://example.com",
+    "phone": "(214) 555-0160",
+    "city": "Dallas",
+    "state": "TX",
+    "categories": ["Audio", "Lighting"],
+    "notes": "Touring & houses of worship."
+  },
+  {
+    "id": "midweststage",
+    "name": "Midwest Staging",
+    "website": "https://example.com",
+    "phone": "(816) 555-0142",
+    "city": "Kansas City",
+    "state": "MO",
+    "categories": ["Video", "Rigging"],
+    "notes": "LED processing & Barco EventMaster specialists."
+  }
+]

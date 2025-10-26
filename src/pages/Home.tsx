@@ -37,7 +37,7 @@ export default function Home() {
       <section id="notify" className="mt-16 rounded-2xl border p-6">
         <h3 className="text-lg font-semibold">Get notified at launch</h3>
         <p className="mt-1 text-sm text-neutral-600">
-          We’ll email you when AV Edge opens to providers and searchers.
+          We will email you when AV Edge opens to providers and searchers.
         </p>
         <form
           action="https://formspree.io/f/your-id-here"

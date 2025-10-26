@@ -16,3 +16,14 @@ export interface Listing {
   tags?: string[];
   quantity?: number;
 }
+
+export interface Provider {
+  id: string;
+  name: string;
+  website?: string;
+  phone?: string;
+  city: string;
+  state: string;
+  categories: Category[];
+  notes?: string;
+}
