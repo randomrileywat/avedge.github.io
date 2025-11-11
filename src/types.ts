@@ -1,20 +1,21 @@
 export type Category = "Audio" | "Video" | "Lighting" | "Networking" | "Rigging";
 
-export interface Listing {
-  id: string;
+export interface UploadRowRaw {
+  // flexible keys before normalization
+  [key: string]: unknown;
+}
+
+export interface ListingNormalized {
+  id?: string;                      // optional vendor id
   make: string;
   model: string;
   category: Category;
-  dailyRateUSD?: number;
-  locationCity: string;
-  locationState: string;
-  provider: {
-    name: string;
-    phone?: string;
-    website?: string;
-  };
+  quantity: number;
+  dailyRateUSD?: number | null;
+  locationCity?: string;
+  locationState?: string;           // 2-letter preferred
+  providerName?: string;
   tags?: string[];
-  quantity?: number;
 }
 
 export interface Provider {
