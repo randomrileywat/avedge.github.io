@@ -1,138 +1,224 @@
 import { useState } from "react";
-import { z } from "zod";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/auth";
+import type { Category } from "../types";
 
-const Schema = z.object({
-  company: z.string().min(2, "Company name is required"),
-  contact: z.string().min(2, "Contact name is required"),
-  email: z.string().email("Valid email required"),
-  phone: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().length(2, "Use 2-letter state").optional().or(z.literal("")),
-  website: z.string().url().optional().or(z.literal("")),
-  categories: z.array(z.string()).min(1, "Select at least one category"),
-  notes: z.string().optional()
-});
-
-const CATEGORIES = ["Audio","Video","Lighting","Networking","Rigging"];
+const CATEGORY_OPTIONS: Category[] = [
+  "Audio",
+  "Video",
+  "Lighting",
+  "Networking",
+  "Rigging",
+];
 
 export default function ProviderIntake() {
-  const [status, setStatus] = useState<"idle"|"sending"|"ok"|"err">("idle");
-  const [errs, setErrs] = useState<Record<string,string>>({});
+  const { user } = useAuth();
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [companyName, setCompanyName] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [website, setWebsite] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [notes, setNotes] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  function toggleCategory(c: Category) {
+    setCategories((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+    );
+  }
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const form = {
-      company: String(fd.get("company")||""),
-      contact: String(fd.get("contact")||""),
-      email: String(fd.get("email")||""),
-      phone: String(fd.get("phone")||""),
-      city: String(fd.get("city")||""),
-      state: String(fd.get("state")||""),
-      website: String(fd.get("website")||""),
-      categories: fd.getAll("categories").map(String),
-      notes: String(fd.get("notes")||""),
-      // honeypot
-      hello: String(fd.get("hello")||"")
-    };
+    setSubmitting(true);
+    setMessage(null);
+    setError(null);
 
-    // honeypot spam trap
-    if (form.hello) return;
+    try {
+      const { error } = await supabase.from("provider_intake").insert([
+        {
+          user_id: user?.id ?? null,
+          company_name: companyName,
+          contact_name: contactName || null,
+          contact_email: contactEmail,
+          phone: phone || null,
+          website: website || null,
+          city: city || null,
+          state: state || null,
+          categories,
+          notes: notes || null,
+          status: "new",
+        },
+      ]);
 
-    const parsed = Schema.safeParse(form);
-    if (!parsed.success) {
-      const map: Record<string,string> = {};
-      parsed.error.issues.forEach(i => { map[i.path[0] as string] = i.message; });
-      setErrs(map);
-      return;
+      if (error) {
+        console.error(error);
+        setError(error.message);
+      } else {
+        setMessage(
+          "Thanks for reaching out! We’ve received your info and will follow up as we onboard providers."
+        );
+        // light reset
+        setCompanyName("");
+        setContactName("");
+        setContactEmail("");
+        setPhone("");
+        setWebsite("");
+        setCity("");
+        setState("");
+        setCategories([]);
+        setNotes("");
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "Something went wrong submitting your info.");
+    } finally {
+      setSubmitting(false);
     }
-    setErrs({});
-    setStatus("sending");
-
-    // replace with your Formspree endpoint
-    const endpoint = "https://formspree.io/f/your-id-here";
-
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Accept": "application/json" },
-      body: new FormData(e.currentTarget)
-    });
-
-    setStatus(res.ok ? "ok" : "err");
-    if (res.ok) (e.currentTarget as HTMLFormElement).reset();
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className="text-2xl font-bold">List Your Company</h1>
-      <p className="mt-2 text-neutral-600">
-        Fill this out and we’ll contact you to sync inventory and verify your listing.
+    <main className="mx-auto max-w-2xl px-6 py-12">
+      <h1 className="text-2xl font-bold">List your company on AV Edge</h1>
+      <p className="mt-2 text-sm text-neutral-600">
+        Share a few details about your rental company and we’ll follow up as we
+        onboard early providers into the platform.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 grid gap-4">
-        <div className="hidden">
-          <label>Do not fill this out<input name="hello" className="border" /></label>
+      <form onSubmit={onSubmit} className="mt-6 grid gap-4">
+        <div>
+          <label className="block text-sm font-medium">Company name *</label>
+          <input
+            required
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+          />
         </div>
 
-        <Field label="Company" name="company" required error={errs.company} />
-        <Field label="Contact name" name="contact" required error={errs.contact} />
-        <Field label="Email" name="email" type="email" required error={errs.email} />
-        <Field label="Phone" name="phone" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="City" name="city" />
-          <Field label="State (2-letter)" name="state" maxLength={2} />
-        </div>
-        <Field label="Website" name="website" placeholder="https://…" />
-
-        <fieldset className="rounded-xl border p-4">
-          <legend className="px-2 text-sm font-medium">Categories</legend>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {CATEGORIES.map(c => (
-              <label key={c} className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="categories" value={c} className="h-4 w-4" />
-                {c}
-              </label>
-            ))}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium">Contact name</label>
+            <input
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
           </div>
-          {errs.categories && <p className="mt-2 text-sm text-red-600">{errs.categories}</p>}
-        </fieldset>
+          <div>
+            <label className="block text-sm font-medium">Contact email *</label>
+            <input
+              type="email"
+              required
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium">Phone</label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Website</label>
+            <input
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://example.com"
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium">City</label>
+            <input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">State (2-letter)</label>
+            <input
+              value={state}
+              maxLength={2}
+              onChange={(e) => setState(e.target.value.toUpperCase())}
+              className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
 
         <div>
-          <label className="block text-sm font-medium">Notes</label>
-          <textarea name="notes" rows={4} className="mt-1 w-full rounded-xl border px-3 py-2" />
+          <label className="block text-sm font-medium">Primary categories</label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {CATEGORY_OPTIONS.map((c) => {
+              const active = categories.includes(c);
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => toggleCategory(c)}
+                  className={
+                    "rounded-full border px-3 py-1 text-xs " +
+                    (active
+                      ? "bg-neutral-900 text-white border-neutral-900"
+                      : "bg-white text-neutral-700 border-neutral-300")
+                  }
+                >
+                  {c}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button disabled={status==="sending"} className="rounded-xl border px-5 py-3">
-            {status==="sending" ? "Submitting…" : "Submit"}
-          </button>
-          {status==="ok" && <span className="text-sm text-green-700">Thanks — we’ll be in touch!</span>}
-          {status==="err" && <span className="text-sm text-red-700">Something went wrong. Try again.</span>}
+        <div>
+          <label className="block text-sm font-medium">
+            Anything else we should know?
+          </label>
+          <textarea
+            rows={4}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm"
+          />
         </div>
+
+        <button
+          disabled={submitting}
+          className="mt-2 inline-flex items-center justify-center rounded-xl border px-4 py-2 text-sm disabled:opacity-50"
+        >
+          {submitting ? "Submitting…" : "Submit"}
+        </button>
+
+        {message && (
+          <p className="text-sm text-green-700 mt-2">{message}</p>
+        )}
+        {error && (
+          <p className="text-sm text-red-700 mt-2">{error}</p>
+        )}
+
+        {user && (
+          <p className="mt-4 text-xs text-neutral-500">
+            Logged in as <strong>{user.email}</strong>. We’ll tie this intake to
+            your account.
+          </p>
+        )}
       </form>
     </main>
-  );
-}
-
-function Field(props: {
-  label: string; name: string; type?: string; required?: boolean;
-  placeholder?: string; maxLength?: number; error?: string;
-}) {
-  const { label, name, type="text", required=false, placeholder, maxLength, error } = props;
-  return (
-    <div>
-      <label className="block text-sm font-medium">
-        {label}{required && <span className="text-red-600"> *</span>}
-      </label>
-      <input
-        name={name}
-        type={type}
-        required={required}
-        placeholder={placeholder}
-        maxLength={maxLength}
-        className="mt-1 w-full rounded-xl border px-3 py-2"
-      />
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-    </div>
   );
 }
