@@ -1,25 +1,80 @@
 import { supabase } from "./supabase";
+import type { Category } from "../types";
 
-export type ListingRow = {
+export type ListingDB = {
   id: string;
   provider_id: string;
   make: string;
   model: string;
-  category: "Audio"|"Video"|"Lighting"|"Networking"|"Rigging";
+  category: Category;
   quantity: number;
   daily_rate_usd: number | null;
   location_city: string | null;
   location_state: string | null;
   tags: string[] | null;
+  provider: {
+    id: string;
+    name: string | null;
+    city: string | null;
+    state: string | null;
+  } | null;
 };
 
-export async function getAllListings(): Promise<ListingRow[]> {
-  const { data, error } = await supabase
+export type ListingsSearchParams = {
+  q?: string;
+  category?: Category | "All";
+  state?: string;
+};
+
+export async function searchListings(params: ListingsSearchParams): Promise<ListingDB[]> {
+  const { q = "", category = "All", state = "" } = params;
+  let query = supabase
     .from("listings")
-    .select("*");
+    .select(
+      `
+      id,
+      provider_id,
+      make,
+      model,
+      category,
+      quantity,
+      daily_rate_usd,
+      location_city,
+      location_state,
+      tags,
+      provider:providers (
+        id,
+        name,
+        city,
+        state
+      )
+    `
+    );
+
+  if (category && category !== "All") {
+    query = query.eq("category", category);
+  }
+
+  if (state) {
+    query = query.eq("location_state", state.toUpperCase());
+  }
+
+  const trimmed = q.trim();
+  if (trimmed) {
+    // Text search on make, model, and city
+    // Supabase 'or' syntax: col.ilike.%term%,othercol.ilike.%term%
+    const term = trimmed.replace(/%/g, ""); // basic sanitize for %
+    query = query.or(
+      `make.ilike.%${term}%,model.ilike.%${term}%,location_city.ilike.%${term}%`
+    );
+  }
+
+  const { data, error } = await query;
+
   if (error) {
-    console.error("Supabase error:", error);
+    console.error("Supabase search error:", error);
     return [];
   }
-  return data as ListingRow[];
+
+  return (data ?? []) as unknown as ListingDB[];
 }
