@@ -7,8 +7,8 @@ export interface Listing {
   category: Category;
   quantity?: number;
   dailyRateUSD?: number;
-  locationCity: string;
-  locationState: string;
+  locationCity?: string;
+  locationState?: string;
   provider: {
     name: string;
     phone?: string;
