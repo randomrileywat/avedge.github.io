@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      // Flip this to false when you're ready to open AV Edge
+      const MAINTENANCE_MODE = true;
+
+      // Bypass for you / internal testers:
+      // Use https://avedge.us/?admin=true
+      const params = new URLSearchParams(window.location.search);
+      const isBypass = params.get("admin") === "true";
+
+      if (MAINTENANCE_MODE && !isBypass) {
+        // Preserve protocol + host, but send to static maintenance page
+        window.location.replace("/maintenance.html");
+      }
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

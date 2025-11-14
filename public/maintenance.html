@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AV Edge — Maintenance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #050816;
+        --card-bg: #0f172a;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.15);
+        --text-main: #e5e7eb;
+        --text-muted: #9ca3af;
+        --border-subtle: rgba(148, 163, 184, 0.3);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top, #1d2538, #020617 60%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Segoe UI", sans-serif;
+        color: var(--text-main);
+      }
+
+      .shell {
+        width: 100%;
+        max-width: 640px;
+        padding: 24px;
+      }
+
+      .card {
+        position: relative;
+        border-radius: 20px;
+        background: radial-gradient(circle at top left, #020617, #020617),
+          linear-gradient(135deg, #020617, #020617);
+        padding: 24px 24px 20px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: 0 30px 70px rgba(15, 23, 42, 0.7);
+        overflow: hidden;
+      }
+
+      .glow {
+        position: absolute;
+        inset: -80px;
+        background: radial-gradient(
+          circle at top right,
+          rgba(56, 189, 248, 0.16),
+          transparent 55%
+        );
+        opacity: 0.8;
+        pointer-events: none;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: var(--text-muted);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #fbbf24;
+        box-shadow: 0 0 0 5px rgba(250, 204, 21, 0.22);
+      }
+
+      h1 {
+        margin: 16px 0 8px;
+        font-size: 26px;
+        letter-spacing: 0.02em;
+      }
+
+      .brand {
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .lead {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        max-width: 40rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      @media (max-width: 640px) {
+        .card {
+          padding: 20px 18px 18px;
+        }
+        .grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        color: var(--text-muted);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .right-card {
+        border-radius: 16px;
+        border: 1px dashed rgba(148, 163, 184, 0.5);
+        background: radial-gradient(circle at top, #020617, #020617);
+        padding: 12px 14px 14px;
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .meter {
+        margin-top: 10px;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+      }
+
+      .meter-bar {
+        width: 68%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+      }
+
+      .footnote {
+        margin-top: 16px;
+        font-size: 11px;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .footnote span {
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="card">
+        <div class="glow"></div>
+
+        <div class="pill">
+          <span class="status-dot"></span>
+          <span>Maintenance window</span>
+        </div>
+
+        <h1>
+          <span class="brand">AV Edge</span> is getting tuned up.
+        </h1>
+
+        <p class="lead">
+          We’re laying the groundwork to help AV pros find the right rental gear
+          from regional providers across the US. While we wire up the backend,
+          the site is temporarily offline for visitors.
+        </p>
+
+        <div class="grid">
+          <div>
+            <div class="badge-row">
+              <span class="badge">Inventory search</span>
+              <span class="badge">Provider dashboard</span>
+              <span class="badge">Supabase integration</span>
+            </div>
+          </div>
+
+          <div class="right-card">
+            <div>Current status: connecting rental data to search</div>
+            <div class="meter">
+              <div class="meter-bar"></div>
+            </div>
+            <div style="margin-top: 6px;">
+              Next step: onboarding early rental providers into the platform.
+            </div>
+          </div>
+        </div>
+
+        <div class="footnote">
+          <span>Public access will be back soon.</span>
+          <span>Existing testers can use their direct access links.</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
