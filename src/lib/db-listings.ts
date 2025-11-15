@@ -29,9 +29,9 @@ export type ListingsSearchParams = {
 export async function searchListings(params: ListingsSearchParams): Promise<ListingDB[]> {
   const { q = "", category = "All", state = "" } = params;
   let query = supabase
-    .from("listings")
-    .select(
-      `
+  .from("listings")
+  .select(
+    `
       id,
       provider_id,
       make,
@@ -42,6 +42,8 @@ export async function searchListings(params: ListingsSearchParams): Promise<List
       location_city,
       location_state,
       tags,
+      is_hidden,
+      is_boosted,
       provider:providers (
         id,
         name,
@@ -49,7 +51,8 @@ export async function searchListings(params: ListingsSearchParams): Promise<List
         state
       )
     `
-    );
+  )
+  .eq("is_hidden", false);
 
   if (category && category !== "All") {
     query = query.eq("category", category);

@@ -16,8 +16,6 @@ export default function Dashboard() {
   const [listings, setListings] = useState<ProviderListingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
-
-  // Add Listing form state
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [category, setCategory] = useState<Category>("Audio");
@@ -106,6 +104,76 @@ export default function Dashboard() {
       setSaveMsg(`Error: ${e?.message ?? "Unknown error"}`);
     } finally {
       setSaving(false);
+    }
+  }
+
+  const [listBusyId, setListBusyId] = useState<string | null>(null);
+
+  async function toggleHidden(listing: ProviderListingRow) {
+    setListBusyId(listing.id);
+    try {
+      const { data, error } = await supabase
+        .from("listings")
+        .update({ is_hidden: !listing.is_hidden })
+        .eq("id", listing.id)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error(error);
+        setSaveMsg?.(`Error hiding listing: ${error.message}`);
+      } else {
+        setListings((prev) =>
+          prev.map((l) => (l.id === listing.id ? (data as ProviderListingRow) : l))
+        );
+      }
+    } finally {
+      setListBusyId(null);
+    }
+  }
+
+  async function toggleBoost(listing: ProviderListingRow) {
+    setListBusyId(listing.id);
+    try {
+      const { data, error } = await supabase
+        .from("listings")
+        .update({ is_boosted: !listing.is_boosted })
+        .eq("id", listing.id)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error(error);
+        setSaveMsg?.(`Error boosting listing: ${error.message}`);
+      } else {
+        setListings((prev) =>
+          prev.map((l) => (l.id === listing.id ? (data as ProviderListingRow) : l))
+        );
+      }
+    } finally {
+      setListBusyId(null);
+    }
+  }
+
+  async function removeListing(listing: ProviderListingRow) {
+    if (!window.confirm(`Remove ${listing.make} ${listing.model} from your listings?`)) {
+      return;
+    }
+    setListBusyId(listing.id);
+    try {
+      const { error } = await supabase
+        .from("listings")
+        .delete()
+        .eq("id", listing.id);
+
+      if (error) {
+        console.error(error);
+        setSaveMsg?.(`Error removing listing: ${error.message}`);
+      } else {
+        setListings((prev) => prev.filter((l) => l.id !== listing.id));
+      }
+    } finally {
+      setListBusyId(null);
     }
   }
 
@@ -276,6 +344,8 @@ export default function Dashboard() {
                       <th className="text-left py-2 pr-4">Rate</th>
                       <th className="text-left py-2 pr-4">City</th>
                       <th className="text-left py-2 pr-4">State</th>
+                      <th className="text-left py-2 pr-4">Status</th>
+                      <th className="text-left py-2 pr-0">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -290,6 +360,47 @@ export default function Dashboard() {
                         </td>
                         <td className="py-2 pr-4">{l.location_city ?? ""}</td>
                         <td className="py-2 pr-4">{l.location_state ?? ""}</td>
+
+                        {/* Status cell */}
+                        <td className="py-2 pr-4 text-xs">
+                          <div>
+                            {l.is_hidden ? (
+                              <span className="text-neutral-500">Hidden</span>
+                            ) : (
+                              <span className="text-green-700">Visible</span>
+                            )}
+                          </div>
+                          {l.is_boosted && (
+                            <div className="text-[11px] text-amber-600">Boosted</div>
+                          )}
+                        </td>
+
+                        {/* Actions cell */}
+                        <td className="py-2 pr-0 text-xs">
+                          <div className="flex flex-wrap gap-1.5">
+                            <button
+                              disabled={listBusyId === l.id}
+                              onClick={() => toggleHidden(l)}
+                              className="rounded-xl border px-2 py-0.5 disabled:opacity-50"
+                            >
+                              {l.is_hidden ? "Show" : "Hide"}
+                            </button>
+                            <button
+                              disabled={listBusyId === l.id}
+                              onClick={() => toggleBoost(l)}
+                              className="rounded-xl border px-2 py-0.5 disabled:opacity-50"
+                            >
+                              {l.is_boosted ? "Unboost" : "Boost"}
+                            </button>
+                            <button
+                              disabled={listBusyId === l.id}
+                              onClick={() => removeListing(l)}
+                              className="rounded-xl border px-2 py-0.5 text-red-700 disabled:opacity-50"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

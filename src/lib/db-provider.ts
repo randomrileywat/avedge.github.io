@@ -22,6 +22,8 @@ export type ProviderListingRow = {
   location_state: string | null;
   tags: string[] | null;
   created_at: string;
+  is_hidden: boolean;
+  is_boosted: boolean;
 };
 
 export async function getCurrentProviderWithListings(userId: string) {
